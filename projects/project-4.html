@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlowView: Real-Time Wind Visualization for Flight Test Operations — Abdullah Jawhar</title>
+ 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+ 
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+ 
+    :root {
+      --bg:        #FAFAF7;
+      --bg-card:   #FFFFFF;
+      --bg-hover:  #F2F3EE;
+      --text:      #1C1917;
+      --text-dim:  #6B6560;
+      --accent:    #5C7043;
+      --accent-lt: #4A5C35;
+      --border:    #E2E0DB;
+      --serif:     'Space Mono', monospace;
+      --sans:      'Space Mono', monospace;
+    }
+ 
+    html { scroll-behavior: smooth; font-size: 14px; }
+ 
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    body.loaded { opacity: 1; }
+
+ 
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 2rem; }
+    a { color: var(--accent); text-decoration: none; transition: color .2s; }
+    a:hover { color: var(--accent-lt); }
+ 
+    /* ── Nav ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(250,250,247,.85);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0,0,0,.04);
+    }
+    nav .container {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    nav .logo { font-family: var(--serif); font-size: 1.15rem; color: var(--text); }
+    nav .nav-links { display: flex; gap: 2rem; list-style: none; }
+    nav .nav-links a {
+      color: var(--text-dim); font-size: .85rem;
+      font-weight: 500; letter-spacing: .03em; transition: color .2s;
+    }
+    nav .nav-links a:hover { color: var(--text); }
+ 
+    /* ── Back link ── */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      color: var(--text-dim);
+      font-size: .85rem;
+      margin-top: 6rem;
+      margin-bottom: 3rem;
+      transition: color .2s;
+    }
+    .back-link:hover { color: var(--text); }
+ 
+    /* ── Project Header ── */
+    .project-header {
+      padding-bottom: 3rem;
+      border-bottom: 2px solid #c0b9b0;
+      margin-bottom: 3rem;
+    }
+ 
+    .project-meta {
+      display: flex;
+      gap: .6rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.25rem;
+    }
+    .meta-tag {
+      font-size: .7rem; font-weight: 700;
+      padding: .25rem .7rem;
+      border-radius: 4px;
+      background: rgba(92,112,67,.1);
+      color: var(--accent);
+    }
+ 
+    .project-title {
+      font-family: var(--serif);
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+ 
+    .project-summary {
+      font-size: 1rem;
+      color: var(--text-dim);
+      max-width: 680px;
+      margin-bottom: 2rem;
+    }
+ 
+    .project-stats {
+      display: flex;
+      gap: 3rem;
+      flex-wrap: wrap;
+    }
+    .stat-item { display: flex; flex-direction: column; gap: .2rem; }
+    .stat-label { font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; color: var(--text-dim); }
+    .stat-value { font-size: .9rem; font-weight: 700; }
+ 
+    /* ── Main image ── */
+    .project-main-image {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      margin-bottom: 3rem;
+      /* Remove this background once you add a real image */
+      background: var(--bg-hover);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-dim); font-size: .85rem;
+    }
+ 
+    /* ── Content sections ── */
+    .project-content {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+ 
+    .project-body h2 {
+      font-family: var(--serif);
+      font-size: 1.2rem;
+      margin-top: 2.5rem;
+      margin-bottom: .75rem;
+    }
+    .project-body h2:first-child { margin-top: 0; }
+ 
+    .project-body p {
+      color: var(--text-dim);
+      margin-bottom: 1rem;
+      font-size: .9rem;
+    }
+ 
+    .project-body ul {
+      list-style: none;
+      margin-bottom: 1rem;
+    }
+    .project-body ul li {
+      color: var(--text-dim);
+      font-size: .9rem;
+      padding: .3rem 0;
+      padding-left: 1.2rem;
+      position: relative;
+    }
+    .project-body ul li::before {
+      content: '→';
+      position: absolute; left: 0;
+      color: var(--accent);
+      font-size: .75rem;
+    }
+ 
+    /* ── Sidebar ── */
+    .project-sidebar {
+      position: sticky;
+      top: 90px;
+    }
+ 
+    .sidebar-block {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+ 
+    .sidebar-block h4 {
+      font-size: .7rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--text-dim);
+      margin-bottom: 1rem;
+    }
+ 
+    .sidebar-block p {
+      font-size: .85rem;
+      color: var(--text-dim);
+    }
+ 
+    .sidebar-tags { display: flex; flex-wrap: wrap; gap: .4rem; }
+    .sidebar-tag {
+      font-size: .72rem;
+      padding: .3rem .7rem;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      color: var(--text-dim);
+    }
+ 
+    .sidebar-link {
+      display: flex; align-items: center; gap: .5rem;
+      font-size: .85rem;
+      color: var(--accent);
+      margin-bottom: .5rem;
+    }
+    .sidebar-link:last-child { margin-bottom: 0; }
+ 
+    /* ── Extra images ── */
+    .project-images {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 2.5rem;
+    }
+ 
+    .project-images img,
+    .project-images .img-placeholder {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-hover);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-dim); font-size: .8rem;
+    }
+ 
+    /* ── Footer ── */
+    .project-footer {
+      margin-top: 5rem;
+      padding: 2.5rem 0;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+ 
+    .project-footer a {
+      font-size: .85rem;
+      color: var(--text-dim);
+      display: inline-flex; align-items: center; gap: .4rem;
+    }
+    .project-footer a:hover { color: var(--text); }
+ 
+    footer {
+      padding: 2rem 0;
+      text-align: center;
+      font-size: .78rem;
+      color: var(--text-dim);
+      border-top: 1px solid var(--border);
+      margin-top: 2rem;
+    }
+ 
+    @media (max-width: 768px) {
+      .project-content { grid-template-columns: 1fr; }
+      .project-sidebar { position: static; }
+      .project-stats { gap: 1.5rem; }
+      .project-images { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+ 
+<body>
+ 
+  <!-- ═══════════ Nav ═══════════ -->
+  <nav>
+    <div class="container">
+      <a href="../index.html" class="logo">AJ.</a>
+      <ul class="nav-links">
+        <li><a href="../index.html#about">About Me</a></li>
+        <li><a href="../index.html#projects">Projects</a></li>
+        <li><a href="../index.html#experience">Industry Experience</a></li>
+        <li><a href="../index.html#interests">Interests</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+ 
+  <!-- ═══════════ Content ═══════════ -->
+  <div class="container">
+ 
+    <a href="../index.html#projects" class="back-link">← Back to Projects</a>
+ 
+    <!-- Project Header -->
+    <div class="project-header">
+      <h1 class="project-title">FlowView: Real-Time Wind Visualization for Flight Test Operations</h1>
+      <p> <class="project-summary">
+        Flight test programs lose millions of dollars repeating conditions because a single wind sensor can't capture how the wind is behaving across the entire airfield. FlowView fixes that with a LiDAR-based system that gives test teams a real-time, spatially resolved picture of the wind, so they can stop flying blind and start making every test count.
+      </p>
+      <p>
+      </br>  
+        Note: This is a startup concept and design project rather than a formal research study. I tried to adapt the IMRD format to communicate the problem, proposed solution, expected impact, and evaluation of the approach.
+      </p>
+    </div>
+ 
+ 
+    <!-- Body + Sidebar -->
+    <div class="project-content">
+ 
+      <div class="project-body">
+ 
+        <h2>Overview</h2>
+        <p>
+          Every airplane must undergo strenuous flight testing to make sure it's safe. Flight testing is the process by which manufacturers demonstrate that the new vehicle performs safely and predictably across the full range of conditions it will encounter in service. Flight testing is what stands between a design on paper and a vehicle the public can trust, and it is the final checkpoint before regulators such as the FAA grant certification. A significant portion of this testing focuses on takeoff and landing performance, because these are the phases of flight in which the aircraft operates closest to the ground, at the lowest speeds, and with the smallest margins for error. To produce data that regulators will accept, these tests must be conducted within tightly defined environmental conditions, and wind is among the most important. Wind speed and direction directly affects how much runway an aircraft needs to takeoff, which is why every wind-sensitive test condition has a strict wind tolerance that must be met for the data to be valid. The challenge is that flight test teams currently rely on a single anemometer or ultrasonic sensor placed near the midpoint of the airfield to characterize the wind across an area spanning more than 10 square kilometers. Wind, however, behaves very differently from one point on an airfield to another, and this single-point reading frequently misrepresents what the aircraft actually experiences on the runway. When a test is conducted and the wind turns out to have been outside tolerance, the data must be discarded and the condition repeated, at a cost of more than $25,000 per repeat, with only about three of ten daily conditions typically considered successful, amounting to roughly $175,000 in lost opportunity per test day and millions of dollars over a multi-year test program. This measurement gap is also becoming a bottleneck for the broader industry as Urban Air Mobility (UAM) manufacturers prepare to operate at low altitudes, where wind behavior is dynamic, poorly characterized, and not yet captured in any large-scale dataset. The objective of this project is to design and develop FlowView, a LiDAR-based wind visualization system that gives flight test teams a real-time, spatially resolved view of the wind across an entire airfield, and that simultaneously builds the low-altitude wind dataset the industry needs to safely integrate next-generation air vehicles.
+        </p>
+ 
+        <h2>Methods</h2>
+        <p>
+          FlowView supplements existing wind sensors with a LiDAR-based system that scans the airfield in real time and renders wind behavior as an intuitive vector-field overlay of the operational area. Rather than reporting a single scalar value, the display shows wind direction and magnitude across the full airfield, allowing test teams to identify approaching gusts before they reach the runway and to time test conditions strategically around them. The system is being designed as a supplemental tool that integrates alongside legacy anemometers and ultrasonic sensors, rather than replacing them, which lowers the barrier to adoption for flight test organizations.
+        </p>
+
+ 
+        <h2>Results & Discussions</h2>
+        <p>
+          Although FlowView is still in the concept and early-development stage, the expected impact can be quantified directly from current flight test economics. If the system reduces repeat test conditions by even a modest fraction, the savings will scale: a single avoided repeat recovers approximately $25,000, and improving the daily success rate from three out of ten conditions to a higher ratio compounds into millions of dollars across a multi-year program. A second, longer-horizon outcome is the wind dataset itself. Because every customer using FlowView would inherently be collecting low-altitude wind measurements during normal operations, the system would generate the kind of large-scale, spatially distributed dataset that the industry currently lacks. This dataset would, in turn, enable the development of predictive low-altitude wind models that air traffic management companies such as SkyGrid could use to simulate UAM operations in digital twins with much higher fidelity than is possible today.
+        </br>
+          FlowView is entering the market at a moment when the need for better low-altitude wind characterization is shifting from a quiet inefficiency in legacy flight test programs to a critical enabler for the next generation of aviation. UAM developers including Joby Aviation, Wisk, and Archer Aviation are completing vehicle development and now face the harder problem of integrating their aircraft into real-world airspace, which requires accurate digital twins of the operating environment. The strength of the FlowView approach lies in its dual value proposition: it pays for itself through immediate flight test cost savings, and it generates a strategic data asset whose value grows with adoption. The main limitations to address are the cost and deployment complexity of LiDAR hardware, the need to validate visualization accuracy against established wind measurement standards, and the regulatory and procedural work required to integrate a new tool into existing flight test workflows. Next steps include developing a prototype deployment, partnering with a flight test organization for an initial pilot, and refining the data pipeline that converts raw LiDAR returns into the vector-field display and the underlying wind database.
+        </p>
+ 
+ 
+      </div>
+ 
+    </div>
+ 
+    <!-- Prev / Next navigation -->
+    <div class="project-footer">
+      <a href="project-3.html">← Previous Project</a>
+      <a href="../index.html#projects">All Projects</a>
+    </div>
+ 
+  </div>
+ 
+    <footer>
+        <div class="container">
+        <p>Copyright © 2026 Abdullah Jawhar.</p>
+        <p>All rights reserved.</p>
+        </div>
+    </footer>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.body.classList.add('loaded');
+    });
+
+    document.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        if (href && !href.startsWith('#') && !href.startsWith('mailto')) {
+          e.preventDefault();
+          document.body.classList.remove('loaded');
+          setTimeout(() => { window.location.href = href; }, 300);
+        }
+      });
+    });
+  </script>  
+ 
+</body>
+</html>
