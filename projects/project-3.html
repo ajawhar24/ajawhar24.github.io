@@ -301,7 +301,6 @@
     <div class="project-header">
       <h1 class="project-title">Image Aesthetic Assessment for Outdoor Scenes</h1>
       <p class="project-summary">
-        Hiking is about being present, not stopping every five minutes to take photos. This project automates the entire process, using an edge-cloud machine learning pipeline to capture and curate the best scenic images so hikers never have to choose between being immersed in the moment and ruining it by having to pull out their phones to take a picture.
       </p>
     </div>
 
@@ -313,25 +312,16 @@
  
         <h2>Overview</h2>
         <p>
-          Hiking is meant to immerse a person in their surroundings, yet capturing the experience typically requires interrupting it by stopping and trying to capture the moment with a camera. The ThirdEye Project addresses this by automating photo capture of scenic views on a hike, allowing hikers to remain present and immersed on the hike. The objective of this project was to design a two-stage pipeline that captures scenic frames on a portable device (that consists of a camera and onboard compute) during a hike and curates a final set of "champion" photos, using machine learning models trained specifically for outdoor aesthetic assessment.
         </p>
  
  
         <h2>Methods</h2>
-        <p>
-          The pipeline pairs an edge stage with a cloud stage. On the edge, a Raspberry Pi 4 hosts a Luxonis OAK-D Lite camera that samples frames at 2 FPS; these frames pass basic pre-filtering (blur, exposure, etc.) before reaching a MobileNetV3 aesthetic-threshold model distilled from a DINOv2 teacher and trained on a custom 2,000-image Pittsburgh hiking dataset. Frames that exceed the aesthetic threshold are saved to disk for later upload. In the cloud stage, surviving images flow through three scoring models: NIMA (technical quality, trained on SPAQ), DINOv2 with a fine-tuned MLP head (aesthetic quality, trained on ScenicOrNot), and MaskFormer with an MLP head (subject quality, also trained on ScenicOrNot), and are then clustered by DINOv2 embeddings using HDBSCAN to remove near-duplicates. The top-scoring image from each cluster is selected as a champion, yielding roughly twenty curated outputs per hike. Six architectures (NIMA, TANet, MUSIQ, TOPIQ, DINOv2-Small, DINOv3-Small) were benchmarked across AVA, ScenicOrNot, and the custom dataset to select the final models.</br>
-
-          My contribution centered on edge integration: setting up the Raspberry Pi 4 and OAK-D Lite hardware stack, building the deployment workflow (converting PyTorch model to ONNX then to a blob file (for compatibility with Luxonis's RVC2 hardware via the Luxonis ModelConverter), and developing the DepthAI v3 inference pipeline that runs the distilled MobileNetV3 model on the camera's onboard MyriadX VPU.
-        </p>
+        
 
  
  
         <h2>Results & Discussions</h2>
-        <p>
-          DINOv2-Small with a fine-tuned MLP head achieved the strongest correlation on ScenicOrNot, reaching an SRCC of 0.84 and a PLCC of 0.86, outperforming NIMA-VGG16 (0.76 / 0.78), MaskFormer (0.73 / 0.75), and the original NIMA baseline (0.72 / 0.74). Validation on the custom Pittsburgh hiking dataset confirmed that these ScenicOrNot-trained scores transferred well to custom hiking imagery, justifying DINOv2's role as the cloud-stage aesthetic rater. Because the OAK-D Lite's MyriadX VPU lacks the memory and cross-attention support needed for DINOv2 inference at the edge, the team distilled the DINOv2 teacher into a MobileNetV3 student that preserved most of the aesthetic-discrimination capability while running within the camera's compute budget.
-        </br>
-        The results demonstrate that self-supervised vision transformers fine-tuned on a domain-appropriate dataset (ScenicOrNot) substantially outperform CNN baselines for outdoor aesthetic assessment, and that knowledge distillation can bridge the gap between strong-but-heavy teacher models and the constrained compute available on edge VPUs. The two-stage edge–cloud split proved effective: the lightweight MobileNetV3 filter is sufficient to discard clearly poor frames in real time, while the cloud stage applies the full ensemble of technical, aesthetic, and subject models to a much smaller candidate set. Future work includes a trainable champion selector to replace the heuristic top-of-cluster rule, expansion of the training set with web-scale imagery, and refinement of the metrics used to define "aesthetic" in the hiking context.
-        </p>
+        
 
       </div>
     </div>

@@ -301,7 +301,6 @@
     <div class="project-header">
       <h1 class="project-title">Deep Learning-Based Gym Exercise Classification</h1>
       <p class="project-summary">
-        Most wearable health devices struggle with exercise classification. This project builds a deep learning-based exercise classifier that can, and shows that fine-tuning on just a handful of labeled reps is enough to adapt it to new exercise variations.
       </p>
     </div>
  
@@ -312,20 +311,13 @@
  
         <h2>Overview</h2>
         <p>
-            Accurate, automated exercise tracking has the potential to meaningfully improve outcomes in physical rehabilitation, sports training, and general fitness — yet most commercial wearables rely on simple heuristics that fail to distinguish biomechanically similar movements. This project addresses that gap by building a deep learning classifier that identifies specific strength training exercises from inertial measurement unit (IMU) data collected at the wrist. The objective was to train a model on a publicly available IMU dataset, evaluate how well it generalized to novel data collected by our team, and investigate whether progressive fine-tuning on a small amount of that new data could improve performance.
         </p>
  
  
         <h2>Methods</h2>
-        <p>The classifier is built on the CNN-ResBiGRU architecture proposed by Mekruksavanich and Jitpattanakul (2024), adapted for a binary classification task distinguishing Arm Curls from Bench Press.</p>
-        <p>The model was trained using Leave-One-Subject-Out (LOSO) cross-validation on the Myogym public dataset, with one participant held out as a final test set. Channel-mode ablations (accelerometer-only, gyroscope-only, and both) were run to quantify each modality's contribution. Our team also collected our own IMU data from five participants across ten exercise variations at our university gym, which served as the fine-tuning dataset.</p> 
-        <p>For the fine-tuning study, the model was fine-tuned at increasing amounts of collected data — from one set per exercise pair — with each step reloading the original trained weights to produce independent, non-cumulative measurements. Performance on both the new exercise variations and the original training classes was tracked at every step, the latter serving as a monitor for catastrophic forgetting.</p> 
-        <p>My personal contributions included designing and implementing the full preprocessing and training pipeline, designing the progressive fine-tuning experiment, and participating in gym data collection.</p>
-
+       
         <h2>Results & Discussions</h2>
-        <p>Progressive fine-tuning with increasing amounts of team-collected data improved classification of the new exercise variations while largely preserving accuracy on the original training classes, indicating that catastrophic forgetting was limited.</p>
-        <p> These results demonstrate that a CNN-ResBiGRU classifier trained on a public IMU dataset can learn exercise-discriminative features. Progressive fine-tuning with as few as a handful of labeled sets from the target population offers a practical path to recovering performance, a finding directly relevant to constrained wearable deployments where collecting large labeled datasets is impractical. Future work should quantify the tradeoff between sensor modality requirements (accelerometer-only vs. both) and classification accuracy across sampling rates, which the cross-rate ablation framework built here is designed to support.</p>
- 
+        
       </div>
  
  

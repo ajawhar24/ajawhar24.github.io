@@ -301,12 +301,8 @@
     <div class="project-header">
       <h1 class="project-title">FlowView: Real-Time Wind Visualization for Flight Test Operations</h1>
       <p> <class="project-summary">
-        Flight test programs lose millions of dollars repeating conditions because a single wind sensor can't capture how the wind is behaving across the entire airfield. FlowView fixes that with a LiDAR-based system that gives test teams a real-time, spatially resolved picture of the wind, so they can stop flying blind and start making every test count.
       </p>
-      <p>
-      </br>  
-        Note: This is a startup concept and design project rather than a formal research study. I tried to adapt the IMRD format to communicate the problem, proposed solution, expected impact, and evaluation of the approach.
-      </p>
+ 
     </div>
  
  
@@ -317,22 +313,15 @@
  
         <h2>Overview</h2>
         <p>
-          Every airplane must undergo strenuous flight testing to make sure it's safe. Flight testing is the process by which manufacturers demonstrate that the new vehicle performs safely and predictably across the full range of conditions it will encounter in service. Flight testing is what stands between a design on paper and a vehicle the public can trust, and it is the final checkpoint before regulators such as the FAA grant certification. A significant portion of this testing focuses on takeoff and landing performance, because these are the phases of flight in which the aircraft operates closest to the ground, at the lowest speeds, and with the smallest margins for error. To produce data that regulators will accept, these tests must be conducted within tightly defined environmental conditions, and wind is among the most important. Wind speed and direction directly affects how much runway an aircraft needs to takeoff, which is why every wind-sensitive test condition has a strict wind tolerance that must be met for the data to be valid. The challenge is that flight test teams currently rely on a single anemometer or ultrasonic sensor placed near the midpoint of the airfield to characterize the wind across an area spanning more than 10 square kilometers. Wind, however, behaves very differently from one point on an airfield to another, and this single-point reading frequently misrepresents what the aircraft actually experiences on the runway. When a test is conducted and the wind turns out to have been outside tolerance, the data must be discarded and the condition repeated, at a cost of more than $25,000 per repeat, with only about three of ten daily conditions typically considered successful, amounting to roughly $175,000 in lost opportunity per test day and millions of dollars over a multi-year test program. This measurement gap is also becoming a bottleneck for the broader industry as Urban Air Mobility (UAM) manufacturers prepare to operate at low altitudes, where wind behavior is dynamic, poorly characterized, and not yet captured in any large-scale dataset. The objective of this project is to design and develop FlowView, a LiDAR-based wind visualization system that gives flight test teams a real-time, spatially resolved view of the wind across an entire airfield, and that simultaneously builds the low-altitude wind dataset the industry needs to safely integrate next-generation air vehicles.
         </p>
  
         <h2>Methods</h2>
         <p>
-          FlowView supplements existing wind sensors with a LiDAR-based system that scans the airfield in real time and renders wind behavior as an intuitive vector-field overlay of the operational area. Rather than reporting a single scalar value, the display shows wind direction and magnitude across the full airfield, allowing test teams to identify approaching gusts before they reach the runway and to time test conditions strategically around them. The system is being designed as a supplemental tool that integrates alongside legacy anemometers and ultrasonic sensors, rather than replacing them, which lowers the barrier to adoption for flight test organizations.
         </p>
 
  
         <h2>Results & Discussions</h2>
-        <p>
-          Although FlowView is still in the concept and early-development stage, the expected impact can be quantified directly from current flight test economics. If the system reduces repeat test conditions by even a modest fraction, the savings will scale: a single avoided repeat recovers approximately $25,000, and improving the daily success rate from three out of ten conditions to a higher ratio compounds into millions of dollars across a multi-year program. A second, longer-horizon outcome is the wind dataset itself. Because every customer using FlowView would inherently be collecting low-altitude wind measurements during normal operations, the system would generate the kind of large-scale, spatially distributed dataset that the industry currently lacks. This dataset would, in turn, enable the development of predictive low-altitude wind models that air traffic management companies such as SkyGrid could use to simulate UAM operations in digital twins with much higher fidelity than is possible today.
-        </br>
-          FlowView is entering the market at a moment when the need for better low-altitude wind characterization is shifting from a quiet inefficiency in legacy flight test programs to a critical enabler for the next generation of aviation. UAM developers including Joby Aviation, Wisk, and Archer Aviation are completing vehicle development and now face the harder problem of integrating their aircraft into real-world airspace, which requires accurate digital twins of the operating environment. The strength of the FlowView approach lies in its dual value proposition: it pays for itself through immediate flight test cost savings, and it generates a strategic data asset whose value grows with adoption. The main limitations to address are the cost and deployment complexity of LiDAR hardware, the need to validate visualization accuracy against established wind measurement standards, and the regulatory and procedural work required to integrate a new tool into existing flight test workflows. Next steps include developing a prototype deployment, partnering with a flight test organization for an initial pilot, and refining the data pipeline that converts raw LiDAR returns into the vector-field display and the underlying wind database.
-        </p>
- 
+        
  
       </div>
  

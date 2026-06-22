@@ -300,7 +300,7 @@
     <!-- Project Header -->
     <div class="project-header">
       <h1 class="project-title">Aircraft Collision Risk Assessement for Airport Environments</h1>
-        <p class="project-summary">Runway incursions are among aviation's most dangerous mishaps, yet existing warning systems only detect runway incursions after they've already become a significant problem. This project implements kinematic feasibility filtering and conformal prediction guarantees for a learning-based trajectory forecasting model that predicts where aircraft could physically be in the future, enabling earlier runway incursion detection. This additional time to take action may be the difference between an inconvenience (i.e., go-around or rejected takeoff) and a catastrophic event.</p>
+        <p class="project-summary">  </p>
     </div>
  
     <!-- Body + Sidebar -->
@@ -310,25 +310,20 @@
  
         <h2>Overview</h2>
         <p>
-          Runway incursions, which are unauthorized entry of an aircraft onto an active runway, remain among the most dangerous events in commercial aviation. Existing rule-based safety systems, such as the FAA's Airport Surface Detection Equipment Model X (ASDE-X), detect conflicts reactively and lack the ability to reason probabilistically about where aircraft could be in the future. A system that predicts the forward reachable set (FRS) of an aircraft — the set of positions it could physically occupy over a future time horizon — would enable earlier, more targeted conflict warnings. This project addresses that gap by developing a behaviorally and kinematically grounded FRS estimation pipeline for airport surface operations, evaluated on a real runway incursion at JFK International Airport in January 2023.
         </p>
  
  
         <h2>Methods</h2>
         <p>
-            The pipeline bridges two existing tools: Amelia-TF, a deep learning trajectory forecasting model trained on large-scale airport surface data, and a unicycle kinematic model that encodes physical constraints on aircraft motion. Amelia-TF produces six probabilistic trajectory modes per aircraft per timestep, each representing a distinct behavioral pattern. These modes are then filtered through a kinematic feasibility check — derived from Boeing 737 performance parameters — which penalizes trajectories whose implied turn rates or accelerations violate the predefined kinematic bounds. The feasibility scores are combined with Amelia-TF's learned mode priors to produce a weighted point-cloud FRS. Conflict risk between two aircraft is then computed as the sum of mode-pair weights whose trajectories come within a separation threshold ε. A penalty parameter λ controls how aggressively infeasible modes are discounted, and an ablation sweep over λ ∈ {0, 0.01, 0.1, 1, 10, 100, 1000} and ε ∈ {50, 100, 200, 500} m was conducted to characterize this tradeoff. 
         </p>
         <p>
-            My contribution to the project focused on the kinematic feasibility module (feasibility.py) and its integration into the broader pipeline. This included sourcing and verifying the Boeing 737 performance constants against primary aviation documents, and writing the pipeline's kinematic correctness checks. I also wrote the project's abstract, introduction, and motivation sections in the midterm paper, and contributed to sharpening the articulation of the proposed approach.
         </p>
  
         <h2>Results & Discussion</h2>
         <p>
-            The λ ablation revealed a clear performance knee at λ = 0.1 for both aircraft in the incursion scenario. At that setting, FRS tightness decreased by approximately 35% — from ~70 m to ~45 m for the taxiing aircraft and from ~190 m to ~125 m for the departing aircraft — with no meaningful loss in coverage (both aircraft maintained ~60–63% coverage). Past λ = 1, coverage dropped sharply as the feasibility filter began rejecting modes that matched reality. Visual validation confirmed that the dominant predicted trajectory for the departing aircraft ran straight down Runway 4L, consistent with a normal departure, and that the taxiing aircraft's predictions fanned across the Taxiway B/K intersection with the most probable mode correctly favoring a right turn.
         </p>
 
         <p>
-        The 35% tightness reduction at λ = 0.1 with negligible coverage loss demonstrates the core claim: this kinematically calibrated FRS produces a meaningfully tighter reachable set than a purely probabilistic baseline without sacrificing completeness. 
         </p>    
  
       </div>
